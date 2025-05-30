@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>타임리프 하이퍼링크</h1>
+	<!-- 타임리프에서 하이퍼링크 표현은 <a th:href="@{이동할 주소}"></a> 형태로 사용 -->
+	<div>
+		<!-- 상대주소(Context-relative URL) - 서버 내부간의 이동 -->
+		<!-- 상대주소에서 맨 앞의 / 기호는 루트를 의미하며, 서버상의 루트(ex. localhost:8080) 를 요청함 -->
+<!-- 		<a th:href="@{/test1}">첫번째 타임리프 예제</a> 매핑되는 주소가 없으므로 404 에러 발생함 -->
+		<a th:href="@{/thymeleaf/test1}">첫번째 타임리프 예제</a>
+	</div>
+	<div>
+		<!-- 절대주소(Absolute URL) -->
+		<a th:href="@{http://www.itwillbs.co.kr}">아이티윌 부산 홈페이지</a>
+	</div>
+	<!-- 위의 하이퍼링크들은 일반적인 하이퍼링크로도 동일하게 동작함(즉, 타임리프식 하이퍼링크가 불필요) -->
+	<!-- 하이퍼링크 상에 동적 경로를 생성하거나 특정 파라미터를 전달 시 타임리프의 객체 등과 결합해야할 경우 필요 -->
+	
+	<div>
+		<!-- 파라미터 전달 -->
+		<!-- th:href="@{주소(파라미터명1 = '데이터1', ...생략..., 파라미터명n = '데이터n')}" -->
+		전달받은 data 속성값 : <span th:tparams.get("param1")ext="${data}"></span><br>
+		<a th:href="@{/thymeleaf/test5_2(param1 = 'data1', param2 = 'data2', param3 = ${data})}">타임리프 파라미터 전달</a>
+	</div>
+	
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

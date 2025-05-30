@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta charset="UTF-8">
+	<title>레이아웃 테스트</title>
+	
+</head>
+<body>
+	<!-- 공통 헤더 -->
+	<header th:include="~{fragments/header7}"></header>
+	
+	<hr>
+	
+	<!-- 개별 페이지 내용(실제 본문이 표시될 영역) -->
+	<!-- layout:fragment 속성을 통해 실제 본문을 갖는 대상의 프래그먼트 이름 지정 -->
+	<main layout:fragment="content">
+		<h3>layout 파일 내용</h3>
+	</main>
+	
+	<hr>
+	
+	<!-- 공통 푸터 -->
+	<footer th:include="~{fragments/footer7}"></footer>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>상품 리스트</h1>
+	<table border="1">	
+		<thead>
+			<tr>
+				<th>순번</th>
+				<th>상품명</th>
+				<th>상품설명</th>
+				<th>가격</th>
+				<th>수량</th>
+				<th>등록일시</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- 반복할 블럭의 시작 태그에 th:each 속성을 통해 복수개의 객체(배열, 리스트, Map 등)를 반복 접근 가능 -->
+			<!-- 기본 문법 : th:each="1개 객체 꺼내서 저장할 객체명 : ${원본객체명} -->
+<!-- 			<tr th:each="item : ${itemList}"> -->
+<!-- 				각 <td> 태그에 실제 데이터 출력을 위해서 <td th:text=${객체명.필드명}></td> 형태로 지정 -->
+<!-- 				<td></td> -->
+<!-- 				<td th:text="${item.itemNm}"></td> -->
+<!-- 				<td th:text="${item.itemDetail}"></td> -->
+<!-- 				<td th:text="${item.price}"></td> -->
+<!-- 				<td th:text="${item.stockQty}"></td> -->
+<!-- 				<td th:text="${item.regTime}"></td> -->
+<!-- 			</tr> -->
+
+			<!-- 반복 과정에서 사용되는 반복 상태 정보를 포함하여 반복하는 방법 -->
+			<!-- 기본 문법 : th:each="1개 객체 꺼내서 저장할 객체명, 반복상태객체명 : ${원본객체명} -->
+			<tr th:each="item, status : ${itemList}">
+				<!-- ${반복상태객체명.속성명} 형태로 반복상태값 활용 가능 -->
+				<td th:text="${status.count}"></td>
+				<td th:text="${item.itemNm}"></td>
+				<td th:text="${item.itemDetail}"></td>
+				<td th:text="${item.price}"></td>
+				<td th:text="${item.stockQty}"></td>
+				<td th:text="${item.regTime}"></td>
+			</tr>
+		</tbody>	
+	</table>
+	<hr>
+	<!-- 반복문도 마찬가지로 th:block 태그를 사용하여 실제 내용만 반복 가능함 -->
+<!-- 	<th:block th:each="item, status : ${itemList}"> -->
+<!-- 		<div th:text="${status.index}"></div> -->
+<!-- 		<div th:text="${status.count}"></div> -->
+<!-- 		<div th:text="${status.size}"></div> -->
+<!-- 		<div th:text="${status.odd}"></div> -->
+<!-- 		<div th:text="${status.even}"></div> -->
+<!-- 	</th:block> -->
+	<table border="1">	
+		<thead>
+			<tr>
+				<th>인덱스(0부터시작)</th>
+				<th>카운트(1부터시작)</th>
+				<th>전체사이즈</th>
+				<th>홀수여부</th>
+				<th>짝수여부</th>
+				<th>첫번째요소여부</th>
+				<th>마지막요소여부</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="item, status : ${itemList}">
+				<td th:text="${status.index}"></td>
+				<td th:text="${status.count}"></td>
+				<td th:text="${status.size}"></td>
+				<td th:text="${status.odd}"></td>
+				<td th:text="${status.even}"></td>
+				<td th:text="${status.first}"></td>
+				<td th:text="${status.last}"></td>
+			</tr>
+		</tbody>	
+	</table>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

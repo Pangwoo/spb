@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>상품 정보</h1>
+	<!-- 단일 객체 데이터는 th:xxx="${객체명.속성명}" 형태로 접근 -->
+	<div>
+		상품명 : <span th:text="${itemDTO.itemNm}"></span>
+	</div>
+	<div>
+		상품상세설명 : <span th:text="${itemDTO.itemDetail}"></span>
+	</div>
+	<div>
+<!-- 		상품가격 : <span th:text="${itemDTO.price}"></span> -->
+		<!-- 데이터와 문자열을 함께 출력(결합)하는 방법 -->
+		<!-- 1) 연결연산자 활용 -->
+<!-- 		상품가격 : <span th:text="${itemDTO.price + ' 원'}"></span> -->
+		<!-- 2) || 사이에 ${} 형식으로 데이터를 표현하고 일반 텍스트는 ${} 바깥에 기술 -->
+		상품가격 : <span th:text="|${itemDTO.price} 원22|"></span>
+	</div>
+	<div>
+		상품수량 : <span th:text="${itemDTO.stockQty}"></span>
+	</div>
+	<div>
+		상품등록일시 : <span th:text="${itemDTO.regTime}"></span><br>
+		<!-- 타임리프 메세지 표현식(속성 파일에 접근) : #{} -->
+		<!-- ${} 표현식 내부에 # 사용하여 타임리프 내장객체에 접근 가능 -->
+		<!-- ${#templorals.format(원본날짜객체, '날짜포맷문자열')}  =>  java.time 패키지(LocalDate, LocalTime, LocalDateTime 등)의 날짜 포맷 변경 -->
+		<!-- 참고) Date, Calendar 등의 전통적인 객체 포맷팅은 #dates.format() 활용 -->
+		상품등록일시(포맷팅) : <span th:text="${#temporals.format(itemDTO.regTime, 'yyyy-MM-dd hh:mm:ss')}"></span>
+	</div>
+	<hr>
+	
+	<!-- th:object 사용하여 객체를 선택한 후 *{속성명} 형태로 객체명 생략하고 접근 가능 -->
+	<div th:object="${itemDTO}">
+		<!-- 위의 div 블록 내부에서는 itemDTO 객체명을 생략하고 *{속성명} 만으로 접근 -->
+		<div>
+			상품명 : <span th:text="*{itemNm}"></span>
+		</div>
+		<div>
+			상품상세설명 : <span th:text="*{itemDetail}"></span>
+		</div>
+		<div>
+			상품가격 : <span th:text="|*{price} 원22|"></span>
+		</div>
+		<div>
+			상품수량 : <span th:text="*{stockQty}"></span>
+		</div>
+		<div>
+			상품등록일시(포맷팅) : <span th:text="*{#temporals.format(regTime, 'yyyy-MM-dd hh:mm:ss')}"></span>
+		</div>
+	</div>
+	<hr>
+	
+	<!-- th:object 를 사용하기 위한 블럭으로 div 태그(또는 span) 등을 지정할 경우 불필요한 태그가 사용됨(불필요한 DOM 생성됨) -->
+	<!-- 따라서, 타임리프에서는 블럭을 생성하는 가상 태그로 <th:block> 태그 제공함 -->
+	<!-- 즉, <th:block th:object=...> 형태로 블럭 지정을 통해 객체 사용도 가능함 -->
+	<th:block th:object="${itemDTO}">
+		<!-- th:block 태그 내부에서는 itemDTO 객체명을 생략하고 *{속성명} 만으로 접근 -->
+		<div>
+			상품명 : <span th:text="*{itemNm}"></span>
+		</div>
+		<div>
+			상품상세설명 : <span th:text="*{itemDetail}"></span>
+		</div>
+		<div>
+			상품가격 : <span th:text="|*{price} 원22|"></span>
+		</div>
+		<div>
+			상품수량 : <span th:text="*{stockQty}"></span>
+		</div>
+		<div>
+			상품등록일시(포맷팅) : <span th:text="*{#temporals.format(regTime, 'yyyy-MM-dd hh:mm:ss')}"></span>
+		</div>
+	</th:block>
+	
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

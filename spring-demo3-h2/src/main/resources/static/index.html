@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>index.html</h1>
+	<h3><a href="/item">상품 관리 페이지</a></h3>
+	<hr>
+	<h3><a href="allMembers">allMembers 요청</a></h3>
+	<h3><a href="member?id=1">1번 회원정보 요청</a></h3>
+	<hr>
+	<form action="findMemberName" method="post">
+		<input type="text" name="name" placeholder="이름">
+		<input type="submit" value="이름 조회">
+	</form>
+	<hr>
+	<form action="registMember" method="post">
+		<input type="text" name="name" placeholder="이름">
+		<input type="submit" value="이름 저장">
+	</form>
+	<hr>
+	<form action="removeMember" method="post">
+		<input type="text" name="id" placeholder="번호">
+		<input type="submit" value="회원 삭제">
+	</form>
+	<hr>
+	<form action="modifyMember" method="post">
+		<input type="text" name="id" placeholder="번호">
+		<input type="text" name="name" placeholder="변경할 이름">
+		<input type="submit" value="회원 수정">
+	</form>
+	
+	
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

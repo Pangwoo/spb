@@ -1,0 +1,9 @@
+<!-- Layout Dialect 사용하기 위한 xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 설정 추가 -->
+<!-- layout:fragment="header" 사용하여 현재 페이지를 프래그먼트 형식으로 추가할 수 있도록 프래그먼트 이름 지정 -->
+<th:block xmlns:th="http://www.thymeleaf.org"
+		xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+		layout:fragment="header">
+	<div>
+		<h3>header 영역</h3>
+	</div>
+</th:block>

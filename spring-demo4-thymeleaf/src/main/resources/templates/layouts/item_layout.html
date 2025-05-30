@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta charset="UTF-8">
+	<title>레이아웃 테스트</title>
+	
+	<!-- 공통 CSS 영역 -->
+	<!-- 기본적인 정적 리소스(css, js 파일 등) 지정 시 루트(/) 기본 위치는 static -->
+	<link rel="stylesheet" th:href="@{/css/item_common.css}" />
+	
+	<!-- 개별페이지 CSS 영역(개별페이지에서 프래그먼트 이름을 사용하여 각 CSS 파일을 별도로 포함시킬 영역) -->
+	<th:block layout:fragment="style"></th:block>
+</head>
+<body>
+	<!-- 공통 헤더 -->
+<!-- 	<header th:include="~{fragments/item_header}"></header> -->
+	<header>
+		<th:block th:replace="~{fragments/item_header}"></th:block>
+	</header>
+	<hr>
+	
+	<!-- 개별 페이지 내용(실제 본문이 표시될 영역) -->
+	<!-- layout:fragment 속성을 통해 실제 본문을 갖는 대상의 프래그먼트 이름 지정 -->
+	<main>
+		<th:block layout:fragment="content">
+			<h3>layout 파일 내용</h3> <!-- 보이지 않는 내용 -->
+		</th:block>
+	</main>
+	
+	<hr>
+	<!-- 공통 푸터 -->
+<!-- 	<footer th:include="~{fragments/item_footer}"></footer> -->
+	<footer>
+		<th:block th:replace="~{fragments/item_footer}"></th:block>
+	</footer>
+	
+	<!-- 공통 자바스크립트 영역 -->
+	<script th:src="@{/js/item_common.js}"></script>
+	
+	<!-- 개별 페이지 자바스크립트 영역 -->
+	
+</body>
+	<th:block layout:fragment="script"></th:block>
+	<script>
+		console.log("!!!!")
+	</script>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

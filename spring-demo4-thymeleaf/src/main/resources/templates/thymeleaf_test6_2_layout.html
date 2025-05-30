@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout">
+<head>
+<meta charset="UTF-8">
+<title>레이아웃 테스트</title>
+</head>
+<body>
+	<!-- 공통 헤더 -->
+	<header th:replace="~{fragments/header}"></header> 
+	
+	<!-- 개별 페이지 내용(실제 본문이 표시될 영역) -->
+	<div th:replace="~{::content}"></div>
+	
+	<!-- 공통 푸터 -->
+	<footer th:replace="~{fragments/footer::footer}"></footer>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
