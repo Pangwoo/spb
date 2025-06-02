@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/layout}">
+<head>
+	<title>Insert title here</title>
+	<!-- 개별페이지 전용 스타일시트 영역 -->
+	<th:block layout:fragment="style">
+		<link rel="stylesheet" th:href="@{/css/main.css}" />
+	</th:block>
+</head>
+<body>
+	<th:block layout:fragment="content">
+		<h3>상품 목록</h3>
+		<table border="1">
+			<thead>
+				<tr>
+					<th>번호</th>
+					<th>상품명</th>
+					<th>상세설명</th>
+					<th>가격</th>
+					<th>수량</th>
+					<th>카테고리</th>
+					<th>판매상태</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="item : ${itemList}">
+					<td th:text="${item.id}"></td>
+					<td th:text="${item.itemNm}"></td>
+					<td th:text="${item.itemDetail}"></td>
+					<td th:text="${item.price}"></td>
+					<td th:text="${item.stockQty}"></td>
+<!-- 					<td th:text="${item.category.label}"></td> -->
+<!-- 					<td th:text="${item.sellStatus.label}"></td> -->
+					<td th:text="${item.category}"></td>
+					<td th:text="${item.sellStatus}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</th:block>
+	
+	<!-- 레이아웃 내의 script 프래그먼트 영역에 추가될 스크립트 -->
+	<th:block layout:fragment="script">
+		<script th:src="@{/js/main.js}"></script>
+		<script>
+			console.log("메인페이지 실행됨!");
+		</script>
+	</th:block>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
