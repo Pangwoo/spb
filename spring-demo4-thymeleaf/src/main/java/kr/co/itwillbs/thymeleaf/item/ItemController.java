@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.validation.Valid;
-import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
-
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @Log4j2
@@ -25,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ItemController {
 	@Autowired
 	private ItemService itemService;
-	
+
 	@GetMapping("")
 	public String main() {
 		return "item/item_main";
@@ -66,22 +63,30 @@ public class ItemController {
 			// 이 때, Model 객체를 활용하여 ItemDTO 객체를 저장하지 않아도 자동으로 뷰페이지로 전송됨(오류 정보도 함께 전송됨)
 			return "/item/item_regist_form";
 		}
-
-		
+		// ----------------------------------------------------------------------------
+		// ItemService - registItem() 메서드 호출하여 상품 정보 등록 요청
 		itemService.registItem(itemDTO);
 		
+		// ----------------------------------------------------------------------------
 		return "redirect:/items/list";
 	}
 	
+	// GET 방식 "/list" 매핑
 	@GetMapping("/list")
-	public String listPage(Model model) {
-		List<ItemDTO> items = itemService.getItems();
-		log.info(items);
-		model.addAttribute("items",items);
-		return "/item/item_list";
+	public String getItemList(Model model) {
+		// ItemService - getItemList() 메서드 호출하여 상품 목록 조회 요청
+		// => 파라미터 : 없음   리턴타입 : List<Item>(itemList)
+//		List<Item> itemList = itemService.getItemList();
+		
+		// 엔티티 객체를 직접 전달하는 것은 위험하므로 DTO 로 변환하여 리턴받기(목록 전체를 변환)
+		List<ItemDTO> itemList = itemService.getItemList();
+		log.info(">>>>>>>>>>>>>>>>> itemList.size() : " + itemList.size());
+		log.info(">>>>>>>>>>>>>>>>> itemList : " + itemList);
+		
+		model.addAttribute("itemList", itemList);
+		
+		return "item/item_list";
 	}
-	
-	
 	
 }
 

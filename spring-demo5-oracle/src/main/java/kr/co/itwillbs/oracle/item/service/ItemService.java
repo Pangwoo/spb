@@ -1,6 +1,7 @@
 package kr.co.itwillbs.oracle.item.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,13 @@ public class ItemService {
 		
 		// toItemDTOList() 메서드 활용하여 List<Item> -> List<ItemDTO> 로 변환하여 리턴
 		return toItemDTOList(itemList);
+	}
+	
+	
+	
+	// 상품 업데이트 요청
+	public void updateItemForMapper(Map<String, String> params) {
+		itemMapper.updateItem(params);
 	}
 
 }

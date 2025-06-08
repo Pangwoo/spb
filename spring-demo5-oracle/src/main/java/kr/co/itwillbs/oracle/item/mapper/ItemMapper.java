@@ -1,6 +1,7 @@
 package kr.co.itwillbs.oracle.item.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -11,5 +12,8 @@ public interface ItemMapper {
 
 	// 상품 전체 목록 조회
 	List<Item> findAllItems();
+
+	// 상품정보 수정
+	void updateItem(Map<String, String> params);
 
 }

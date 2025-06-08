@@ -19,7 +19,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class ItemDTO {
-	private Long id;
+	private Long id; // 상품코드(컬럼명 : item_id)
+	
 	// Java Bean Validation 기능을 활용하여 입력값 검증 수행 => Validation 의존성(spring-boot-starter-validation) 추가 필요
 	// => 다양한 어노테이션을 조합하여 검증 조건 설정. 컨트롤러에서 바인딩 시점에 체크 가능
 	// => 기본 문법 : @XXX(message = "오류 발생 시 표시할 메세지") 
@@ -60,15 +61,15 @@ public class ItemDTO {
 	private LocalDateTime regTime; // 상품등록일시
 	private LocalDateTime updateTime; // 상품최종수정일시
 	
+	// ItemCategory 와 ItemSellStatus enum 객체에 저장된 값들을 미리 배열에 저장해둘 수 있음
+//	private ItemCategory[] categories = ItemCategory.values();
+//	private ItemSellStatus[] sellStatuses = ItemSellStatus.values();
+	// => 타임리프 템플릿 페이지에서 ${T(패키지명.enum타입명).values()} 형태로 직접 호출 가능
+	
+	// 파라미터 생성자 정의
 	@Builder
-	public ItemDTO(Long id, String itemNm,
-			String itemDetail,
-			Integer price,
-			Integer stockQty,
-			ItemCategory category,
-			ItemSellStatus sellStatus, LocalDateTime regTime,
-			LocalDateTime updateTime) {
-		super();
+	public ItemDTO(Long id, String itemNm, String itemDetail, Integer price,	Integer stockQty, ItemCategory category, ItemSellStatus sellStatus, 
+			LocalDateTime regTime, LocalDateTime updateTime) {
 		this.id = id;
 		this.itemNm = itemNm;
 		this.itemDetail = itemDetail;
@@ -80,29 +81,30 @@ public class ItemDTO {
 		this.updateTime = updateTime;
 	}
 	
-	// ItemCategory 와 ItemSellStatus enum 객체에 저장된 값들을 미리 배열에 저장해둘 수 있음
-//	private ItemCategory[] categories = ItemCategory.values();
-//	private ItemSellStatus[] sellStatuses = ItemSellStatus.values();
-	// => 타임리프 템플릿 페이지에서 ${T(패키지명.enum타입명).values()} 형태로 직접 호출 가능
-	
+	// Entity 객체를 직접 외부로 전달하지 않고 DTO 객체를 통해 외부와 데이터를 주고 받기 위해서는
+	// DTO <-> Entity 사이의 변환 메서드가 추가적으로 필요함
+	// 1) Entity -> DTO 로 변환하는 fromEntity() 메서드 정의
+	//    => 파라미터 : Entity 객체   리턴타입 : DTO 타입
 	public static ItemDTO fromEntity(Item item) {
 		return ItemDTO.builder()
 				.id(item.getId())
-				.itemNm(item.getItenNm())
-				.itemDetail(item.getItenDetail())
+				.itemNm(item.getItemNm())
+				.itemDetail(item.getItemDetail())
 				.price(item.getPrice())
 				.stockQty(item.getStockQty())
+				.category(item.getCategory())
 				.sellStatus(item.getSellStatus())
 				.regTime(item.getRegTime())
 				.updateTime(item.getUpdateTime())
 				.build();
-				
 	}
 	
+	// 2) DTO -> Entity 로 변환하는 toEntity() 메서드 정의
+	//    => 파라미터 : 없음(현재 객체 DTO 사용)   리턴타입 : Entity 타입
 	public Item toEntity() {
 		return Item.builder()
-				.itenNm(itemDetail)
-				.itenDetail(itemDetail)
+				.itemNm(itemNm)
+				.itemDetail(itemDetail)
 				.price(price)
 				.stockQty(stockQty)
 				.category(category)

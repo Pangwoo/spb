@@ -1,6 +1,5 @@
 package kr.co.itwillbs.thymeleaf.item;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,32 +11,65 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @Service
 public class ItemService {
-	@Autowired
-	private ItemRepository itemRepository;
+	// 자동 주입 필드에 final 사용하려면 생성자 주입 방식 활용
+	private final ItemRepository itemRepository;
 	
+	public ItemService(ItemRepository itemRepository) {
+		this.itemRepository = itemRepository;
+	}
+	// ------------------------------------------------
+	// 상품 정보 등록 요청
 	public void registItem(ItemDTO itemDTO) {
-		Item newItem = itemDTO.toEntity();
-		log.info(newItem);
-		// TODO Auto-generated method stub
-		itemRepository.save(newItem);
-	}
-
-	public List<ItemDTO> getItems() {
-		List<Item> items = itemRepository.findAll();
+		// ItemDTO -> Item 타입으로 변환
+		Item item = itemDTO.toEntity();
+		log.info(">>>>>>>>>>>>>>>>>>> item : " + item);
 		
-		return toItemDTOList(items);
+		// ItemRepository - save() 메서드 호출하여 INSERT 작업 수행
+		itemRepository.save(item);
 	}
 	
-	private List<ItemDTO> toItemDTOList(List<Item> items){
-		return items.stream()
-				.map(ItemDTO :: fromEntity)
+	// 상품 목록 조회
+	public List<ItemDTO> getItemList() {
+		// ItemRepository - findAll() 메서드 호출하여 SELECT * 작업 수행
+//		return itemRepository.findAll();
+		
+		List<Item> itemList = itemRepository.findAll();
+		
+		// List<Entity> 타입 객체를 List<DTO> 타입 객체로 변환하여 리턴하기
+//		return itemList.stream() // Stream 타입 객체로 변환(리스트(컬렉션) 요소를 하나씩 처리해주는 객체 타입)
+////				.map(item -> ItemDTO.fromEntity(item)) // List<Item> 객체의 갯수는 유지하되 타입만 List<ItemDTO> 타입으로 변환
+//				.map(ItemDTO :: fromEntity) // 위의 문장을 메서드 레퍼런스 문법을 사용하여 축약
+//				.collect(Collectors.toList());
+		
+		// 별도의 메서드로 모듈화하여 재사용 가능하도록 변경
+		return toItemDTOList(itemList);
+	}
+	
+	// List<Entity> -> List<DTO> 타입으로 변환하는 메서드 정의(모듈화) => DB 에서 조회 후 외부로 전달할 때
+	private List<ItemDTO> toItemDTOList(List<Item> itemList) {
+		return itemList.stream() // Stream 타입 객체로 변환(리스트(컬렉션) 요소를 하나씩 처리해주는 객체 타입)
+//				.map(item -> ItemDTO.fromEntity(item)) // List<Item> 객체의 갯수는 유지하되 타입만 List<ItemDTO> 타입으로 변환
+				.map(ItemDTO :: fromEntity) // 위의 문장을 메서드 레퍼런스 문법을 사용하여 축약
 				.collect(Collectors.toList());
 	}
 	
-	private List<Item> toItemList(List<ItemDTO> items){
-		return items.stream()
-				.map(ItemDTO :: toEntity)
+	// List<DTO> -> List<Entity> 타입으로 변환하는 메서드 정의(모듈화) => 외부에서 전달받아 DB 작업을 수행할 때
+	private List<Item> toItemList(List<ItemDTO> itemDTOList) {
+		return itemDTOList.stream() // Stream 타입 객체로 변환(리스트(컬렉션) 요소를 하나씩 처리해주는 객체 타입)
+//				.map(itemDTO -> itemDTO.toEntity()) // List<ItemDTO> 객체의 갯수는 유지하되 타입만 List<Item> 타입으로 변환
+				.map(ItemDTO :: toEntity) // 위의 문장을 메서드 레퍼런스 문법을 사용하여 축약
 				.collect(Collectors.toList());
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
