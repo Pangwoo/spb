@@ -24,6 +24,7 @@ import kr.co.itwillbs.oracle.commons.constant.ItemSellStatus;
 import kr.co.itwillbs.oracle.commons.util.EnumUtils;
 import kr.co.itwillbs.oracle.commons.util.FieldUtils;
 import kr.co.itwillbs.oracle.item.dto.ItemDTO;
+import kr.co.itwillbs.oracle.item.dto.ItemSearchDTO;
 import kr.co.itwillbs.oracle.item.entity.Item;
 import kr.co.itwillbs.oracle.item.service.ItemService;
 import lombok.extern.log4j.Log4j2;
@@ -106,6 +107,11 @@ public class ItemController {
 		
 		model.addAttribute("itemList", itemList);
 		
+		// --------------------------------------------------------------------
+		// 검색창 입력값 검증에 활용할 ItemSearchDTO 객체 생성 후 Model 에 저장
+		model.addAttribute("itemSearchDTO", new ItemSearchDTO());
+		// --------------------------------------------------------------------
+		
 		return "item/item_list";
 	}
 	
@@ -179,20 +185,31 @@ public class ItemController {
 		}
 		
 		// ItemService - updateItemForMapper() 메서드 호출하여 마이바티스를 통해 상품정보 업데이트 요청
-		itemService.updateItemForMapper(params);
+		// => 요청 파라미터로 전달받은 컬럼명(Camel-case)을 Snake-Case 표기법으로 변환하여 다시 저장
+		// => 주의! FieldUtils 클래스의 getFieldNames() 메서드를 활용하여 필드명 체크 완료 후 변환해야한다!
+//		params.put("name", FieldUtils.camelCaseToSnakeCase(params.get("name")));
+//		System.out.println("params : " + params);
+//		itemService.updateItemForMapper(params);
 		
 		// ----------------------------------
-		// JPA 로 UPDATE 작업 수행 코드 해야한다!!!!!!!!!!!!!!!!!!!!!
-		// JPA 로 UPDATE 작업 수행 코드 해야한다!!!!!!!!!!!!!!!!!!!!!
-		// JPA 로 UPDATE 작업 수행 코드 해야한다!!!!!!!!!!!!!!!!!!!!!
-		// JPA 로 UPDATE 작업 수행 코드 해야한다!!!!!!!!!!!!!!!!!!!!!
-		// JPA 로 UPDATE 작업 수행 코드 해야한다!!!!!!!!!!!!!!!!!!!!!
-		// JPA 로 UPDATE 작업 수행 코드 해야한다!!!!!!!!!!!!!!!!!!!!!
-		// JPA 로 UPDATE 작업 수행 코드 해야한다!!!!!!!!!!!!!!!!!!!!!
+		// ItemService - updateItem() 메서드 호출하여 JPA 를 통해 상품정보 업데이트 요청
+		itemService.updateItem(params); 
+		
 		
 		// boolean 타입을 @ResponseBody 로 그대로 리턴 시 JSON 형태 그대로 true/false 판별 가능함
 		return true;
 	}
+	
+	// ========================================================================================================================
+	// 상품검색 요청 - "/items/search"(GET)
+	@GetMapping("/search")
+	public String searchItem() {
+		
+		
+		
+		return new String();
+	}
+	
 	
 	
 	

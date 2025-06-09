@@ -41,6 +41,27 @@
 		</table>
 		<hr>
 		<h3>상품 목록 및 수정(AJAX &amp; JSON)</h3>
+		<!-- ========================= 상품 검색 영역 ======================== -->
+		<form th:action="@{/items/search}" id="searchForm" method="get" th:object="${itemSearchDTO}">
+			<div id="commandArea">
+				<select id="searchType" th:field="*{type}">
+					<option value="itemNm">상품명</option>
+					<option value="price">가격</option>
+				</select>
+				
+				<!-- 상품명 입력 텍스트박스와 상품 가격(최소가격, 최대가격) 입력 텍스트박스 표시 -->
+				<input type="text" th:field="*{itemNm}" id="itemNmSearch" placeholder="검색할 상품명" style="display: inline-block;">
+				
+				<div id="priceSearch" style="display: inline-block;">
+					<input type="number" th:field="*{minPrice}" id="minPrice" placeholder="최소가격"> ~
+					<input type="number" th:field="*{maxPrice}" id="maxPrice" placeholder="최대가격">
+				</div>
+				
+				<button type="submit" id="btnSearch">검색</button>
+				<button type="button" id="btnNew">상품등록</button>
+			</div>
+		</form>
+		<!-- ================================================================= -->
 		<table border="1" id="itemTable">
 			<thead>
 				<tr>
@@ -61,130 +82,6 @@
 	<th:block layout:fragment="script">
 		<script th:src="@{/js/main.js}"></script>
 		<script>
-			// jQuery - AJAX 기능 사용을 위해서는 jQuery 라이브러리 필수! (layout.html 파일에 포함시킴)
-			$.ajax({
-				url: "/items/listJson", // 요청 URL
-				type: "get", // 요청메서드
-				dataType: "json", // 응답데이터 형식
-				success: function(data) { // 응답 성공(200) 시 호출될 콜백 함수
-					// 임시) 테이블 윗쪽에 JSON 문자열 형태로 단순 출력
-// 					$("#itemTable").before(JSON.stringify(data));
-					
-					// data 내의 상품목록(itemList) 객체 파싱
-					const itemList = data.itemList;
-					// ItemCategory 와 ItemSellStatus enum 객체의 모든 값 저장된 Map 객체 파싱
-					const categories = data.itemCategories;
-					const sellStatuses = data.itemSellStatuses;
-					
-					console.log(itemList);
-					console.log(categories);
-					console.log(sellStatuses);
-					
-					const tableBody = $("#itemTable tbody");
-					
-					// itemList 객체 반복(내부 객체 1개씩 item 파라미터에 저장)
-					itemList.forEach(function(item) {
-						console.log(item);
-						console.log("item.id : " + item.id);
-						
-						// 테이블의 각 행(row) 생성하고 각 열(column)에 데이터 출력 => jQuery 객체로 row 를 관리
-						// => 입력 가능한 요소들은 입력 요소 태그를 활용
-						const row = $(`<tr>`);
-						
-						// 번호 출력
-						const idCell = $(`<td class="id">`);
-						// 필요한 출력 데이터들은 idCell 의 append() 메서드로 추가
-						idCell.append(item.id);
-						// 번호 출력 셀을 row 에 추가
-						row.append(idCell);
-						
-						// 상품명 출력 => 수정까지 가능하도록 입력요소 태그 활용
-						const itemNmCell = $(`<td class="itemNm">`);
-						// <input type="text" name="itemNm" value="${item.itemNm}">
-						const itemNmInput = $(`<input>`).attr({"type" : "text", "name" : "itemNm"}).val(item.itemNm);
-						itemNmCell.append(itemNmInput);
-						row.append(itemNmCell);
-						
-						// 상품상세설명 출력 => 수정까지 가능하도록 입력요소 태그 활용
-						const itemDetailCell = $(`<td class="itemDetail">`);
-						// <input type="text" name="itemDetail" value="${item.itemDetail}">
-						const itemDetailInput = $(`<input>`).attr({"type" : "text", "name" : "itemDetail"}).val(item.itemDetail);
-						itemDetailCell.append(itemDetailInput);
-						row.append(itemDetailCell);
-						
-						// 상품가격 출력 => 수정까지 가능하도록 입력요소 태그 활용
-						const priceCell = $(`<td class="price">`);
-						// <input type="number" name="price" value="${item.price}">
-						const priceInput = $(`<input>`).attr({"type" : "number", "name" : "price"}).val(item.price);
-						priceCell.append(priceInput);
-						row.append(priceCell);
-						
-						// 상품명 출력 => 수정까지 가능하도록 입력요소 태그 활용
-						const stockQtyCell = $(`<td class="stockQty">`);
-						// <input type="number" name="stockQty" value="${item.stockQty}">
-						const stockQtyInput = $(`<input>`).attr({"type" : "number", "name" : "stockQty"}).val(item.stockQty);
-						stockQtyCell.append(stockQtyInput);
-						row.append(stockQtyCell);
-						
-						// ------------------------------------------------------------						
-						// 상품카테고리 출력 => 수정까지 가능하도록 입력요소 태그 활용
-// 						const categoryCell = $(`<td class="category">`);
-// 						// <input type="text" name="category" value="${item.category}">
-// 						const categoryInput = $(`<input>`).attr({"type" : "text", "name" : "category"}).val(item.category);
-// 						categoryCell.append(categoryInput);
-// 						row.append(categoryCell);
-						// => 단, 카테고리 등은 셀렉트박스를 사용하여 목록 형태로 출력해야하지만
-						//    실제 선택되어있던 값만 전달되므로 나머지 데이터가 존재하지 않아 셀렉트박스 목록 생성 불가!
-						// => 따라서, 별도로 컨트롤러측에서 카테고리 및 판매상태 enum 상수 전체 목록을 저장하여 응답데이터에 포함시켜야함
-						// ------------------------------------------------------------
-						// 카테고리 셀렉트박스
-						const categoryCell = $(`<td class="category">`);
-						// <select name="category"><option value="xxx">yyy</option></select>
-// 						const categorySelect = $(`<select>`).attr({"name" : "category"}); // 속성 하나일 때 중괄호{} 사용 가능(콜론으로 구분)
-						const categorySelect = $(`<select>`).attr("name", "category"); // 속성이 하나일 때 중괄호 미사용 시 콤마로 구분
-						// 셀렉트박스는 <option> 태그가 복수개이므로 <option> 태그에 사용될 값만큼 반복
-						$.each(categories, function(code, label) { // 반복을 통해 key 값이 code, value 값이 label 에 전달됨  
-// 							console.log(code + " : " + label);
-							const option = $(`<option>`)
-											.val(code)
-											.text(label)
-											// 실제 상품의 카테고리값(item.category.code)과 반복중인 카테고리목록의 값이 같으면 selected 로 설정
-											.prop("selected", code == item.category.code);
-							categorySelect.append(option);
-						});
-						categoryCell.append(categorySelect);
-						row.append(categoryCell);
-						
-						// 판매상태 셀렉트박스
-						const sellStatusCell = $(`<td class="sellStatus">`);
-						const sellStatusSelect = $(`<select>`).attr("name", "sellStatus"); // 속성이 하나일 때 중괄호 미사용 시 콤마로 구분
-						$.each(sellStatuses, function(code, label) { // 반복을 통해 key 값이 code, value 값이 label 에 전달됨  
-							const option = $(`<option>`)
-											.val(code)
-											.text(label)
-											// 실제 상품의 판매상태값(item.sellStatus.code)과 반복중인 판매상태목록의 값이 같으면 selected 로 설정
-											.prop("selected", code == item.sellStatus.code);
-							sellStatusSelect.append(option);
-						});
-						sellStatusCell.append(sellStatusSelect);
-						row.append(sellStatusCell);
-						
-						
-						// ------------------------------------------------
-						// 최종적으로 완성된 1개의 row 를 tableBody 에 추가
-						tableBody.append(row);
-					}); // itemList 반복 끝
-					
-					// 테이블 내의 입력 요소들(input 태그와 select 태그 등)에 대한 변경 감지 이벤트 핸들링 => requestUpdate() 함수 호출
-					$("#itemTable input").change(requestUpdate);
-					$("#itemTable select").change(requestUpdate);
-					
-				},
-				error: function() { // 응답 실패 시 호출될 콜백 함수
-					alert("AJAX 요청 실패!");
-				}
-			});
-			// =================================================================
 			// 테이블 내의 입력 요소들(input 태그와 select 태그 등)에 대한 변경 감지 이벤트 핸들링 함수 정의
 			function requestUpdate() {
 // 				console.log("변경됨!");
@@ -228,6 +125,162 @@
 				});
 				
 			}
+			// ===============================================================
+			$(function() {
+				// jQuery - AJAX 기능 사용을 위해서는 jQuery 라이브러리 필수! (layout.html 파일에 포함시킴)
+				$.ajax({
+					url: "/items/listJson", // 요청 URL
+					type: "get", // 요청메서드
+					dataType: "json", // 응답데이터 형식
+					success: function(data) { // 응답 성공(200) 시 호출될 콜백 함수
+						// 임시) 테이블 윗쪽에 JSON 문자열 형태로 단순 출력
+//	 					$("#itemTable").before(JSON.stringify(data));
+						
+						// data 내의 상품목록(itemList) 객체 파싱
+						const itemList = data.itemList;
+						// ItemCategory 와 ItemSellStatus enum 객체의 모든 값 저장된 Map 객체 파싱
+						const categories = data.itemCategories;
+						const sellStatuses = data.itemSellStatuses;
+						
+						console.log(itemList);
+						console.log(categories);
+						console.log(sellStatuses);
+						
+						const tableBody = $("#itemTable tbody");
+						
+						// itemList 객체 반복(내부 객체 1개씩 item 파라미터에 저장)
+						itemList.forEach(function(item) {
+							console.log(item);
+							console.log("item.id : " + item.id);
+							
+							// 테이블의 각 행(row) 생성하고 각 열(column)에 데이터 출력 => jQuery 객체로 row 를 관리
+							// => 입력 가능한 요소들은 입력 요소 태그를 활용
+							const row = $(`<tr>`);
+							
+							// 번호 출력
+							const idCell = $(`<td class="id">`);
+							// 필요한 출력 데이터들은 idCell 의 append() 메서드로 추가
+							idCell.append(item.id);
+							// 번호 출력 셀을 row 에 추가
+							row.append(idCell);
+							
+							// 상품명 출력 => 수정까지 가능하도록 입력요소 태그 활용
+							const itemNmCell = $(`<td class="itemNm">`);
+							// <input type="text" name="itemNm" value="${item.itemNm}">
+							const itemNmInput = $(`<input>`).attr({"type" : "text", "name" : "itemNm"}).val(item.itemNm);
+							itemNmCell.append(itemNmInput);
+							row.append(itemNmCell);
+							
+							// 상품상세설명 출력 => 수정까지 가능하도록 입력요소 태그 활용
+							const itemDetailCell = $(`<td class="itemDetail">`);
+							// <input type="text" name="itemDetail" value="${item.itemDetail}">
+							const itemDetailInput = $(`<input>`).attr({"type" : "text", "name" : "itemDetail"}).val(item.itemDetail);
+							itemDetailCell.append(itemDetailInput);
+							row.append(itemDetailCell);
+							
+							// 상품가격 출력 => 수정까지 가능하도록 입력요소 태그 활용
+							const priceCell = $(`<td class="price">`);
+							// <input type="number" name="price" value="${item.price}">
+							const priceInput = $(`<input>`).attr({"type" : "number", "name" : "price"}).val(item.price);
+							priceCell.append(priceInput);
+							row.append(priceCell);
+							
+							// 상품명 출력 => 수정까지 가능하도록 입력요소 태그 활용
+							const stockQtyCell = $(`<td class="stockQty">`);
+							// <input type="number" name="stockQty" value="${item.stockQty}">
+							const stockQtyInput = $(`<input>`).attr({"type" : "number", "name" : "stockQty"}).val(item.stockQty);
+							stockQtyCell.append(stockQtyInput);
+							row.append(stockQtyCell);
+							
+							// ------------------------------------------------------------						
+							// 상품카테고리 출력 => 수정까지 가능하도록 입력요소 태그 활용
+//	 						const categoryCell = $(`<td class="category">`);
+//	 						// <input type="text" name="category" value="${item.category}">
+//	 						const categoryInput = $(`<input>`).attr({"type" : "text", "name" : "category"}).val(item.category);
+//	 						categoryCell.append(categoryInput);
+//	 						row.append(categoryCell);
+							// => 단, 카테고리 등은 셀렉트박스를 사용하여 목록 형태로 출력해야하지만
+							//    실제 선택되어있던 값만 전달되므로 나머지 데이터가 존재하지 않아 셀렉트박스 목록 생성 불가!
+							// => 따라서, 별도로 컨트롤러측에서 카테고리 및 판매상태 enum 상수 전체 목록을 저장하여 응답데이터에 포함시켜야함
+							// ------------------------------------------------------------
+							// 카테고리 셀렉트박스
+							const categoryCell = $(`<td class="category">`);
+							// <select name="category"><option value="xxx">yyy</option></select>
+//	 						const categorySelect = $(`<select>`).attr({"name" : "category"}); // 속성 하나일 때 중괄호{} 사용 가능(콜론으로 구분)
+							const categorySelect = $(`<select>`).attr("name", "category"); // 속성이 하나일 때 중괄호 미사용 시 콤마로 구분
+							// 셀렉트박스는 <option> 태그가 복수개이므로 <option> 태그에 사용될 값만큼 반복
+							$.each(categories, function(code, label) { // 반복을 통해 key 값이 code, value 값이 label 에 전달됨  
+//	 							console.log(code + " : " + label);
+								const option = $(`<option>`)
+												.val(code)
+												.text(label)
+												// 실제 상품의 카테고리값(item.category.code)과 반복중인 카테고리목록의 값이 같으면 selected 로 설정
+												.prop("selected", code == item.category.code);
+								categorySelect.append(option);
+							});
+							categoryCell.append(categorySelect);
+							row.append(categoryCell);
+							
+							// 판매상태 셀렉트박스
+							const sellStatusCell = $(`<td class="sellStatus">`);
+							const sellStatusSelect = $(`<select>`).attr("name", "sellStatus"); // 속성이 하나일 때 중괄호 미사용 시 콤마로 구분
+							$.each(sellStatuses, function(code, label) { // 반복을 통해 key 값이 code, value 값이 label 에 전달됨  
+								const option = $(`<option>`)
+												.val(code)
+												.text(label)
+												// 실제 상품의 판매상태값(item.sellStatus.code)과 반복중인 판매상태목록의 값이 같으면 selected 로 설정
+												.prop("selected", code == item.sellStatus.code);
+								sellStatusSelect.append(option);
+							});
+							sellStatusCell.append(sellStatusSelect);
+							row.append(sellStatusCell);
+							
+							
+							// ------------------------------------------------
+							// 최종적으로 완성된 1개의 row 를 tableBody 에 추가
+							tableBody.append(row);
+						}); // itemList 반복 끝
+						
+						// 테이블 내의 입력 요소들(input 태그와 select 태그 등)에 대한 변경 감지 이벤트 핸들링 => requestUpdate() 함수 호출
+						$("#itemTable input").change(requestUpdate);
+						$("#itemTable select").change(requestUpdate);
+						
+					},
+					error: function() { // 응답 실패 시 호출될 콜백 함수
+						alert("AJAX 요청 실패!");
+					}
+				});
+				// =================================================================
+				// 상품검색	셀렉트박스 변경(change) 이벤트 핸들링
+				$("#searchType").change(function() {
+// 					console.log("검색 항목 : " + $(this).val());
+					// 선택된 항목에 따라 검색 요소 표시 설정 변경
+					const searchType = $(this).val();
+					if(searchType === "itemNm") {
+						// 상품명 검색 텍스트박스 표시
+						$("#itemNmSearch").show();
+						// 상품가격 검색 텍스트박스 숨김
+						$("#priceSearch").hide();
+						
+						// 숨김처리된 항목은 비활성화, 표시되는 항목은 활성화(비활성화 해제)
+						$("#itemNmSearch").prop("disabled", false); // 상품명 입력창은 활성화
+						$("#minPrice, #maxPrice").prop("disabled", true); // 상품가격 입력창은 비활성화
+					} else if(searchType === "price") {
+						// 상품가격 검색 텍스트박스 표시
+						$("#itemNmSearch").hide();
+						// 상품가격 검색 텍스트박스 숨김
+						$("#priceSearch").show();
+
+						// 숨김처리된 항목은 비활성화, 표시되는 항목은 활성화(비활성화 해제)
+						$("#itemNmSearch").prop("disabled", true); // 상품명 입력창은 비활성화
+						$("#minPrice, #maxPrice").prop("disabled", false); // 상품가격 입력창은 활성화
+					}
+				});
+				
+				// 페이지 로딩 완료 시 상품검색 셀렉트박스에 change 이벤트 강제로 발생시키기
+				$("#searchType").trigger("change");
+					
+			});
 		</script>
 	</th:block>
 </body>

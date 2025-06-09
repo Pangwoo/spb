@@ -6,7 +6,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import kr.co.itwillbs.oracle.commons.util.FieldUtils;
 import kr.co.itwillbs.oracle.item.dto.ItemDTO;
 import kr.co.itwillbs.oracle.item.entity.Item;
 import kr.co.itwillbs.oracle.item.mapper.ItemMapper;
@@ -83,10 +85,33 @@ public class ItemService {
 	
 	
 	
-	// 상품 업데이트 요청
+	// 상품 업데이트 요청 - 마이바티스 활용
+	@Transactional
 	public void updateItemForMapper(Map<String, String> params) {
 		itemMapper.updateItem(params);
 	}
+	
+	
+	// 상품 업데이트 요청 - JPA 활용
+	// => 주의! JPA 업데이트 작업 시 @Transactional 어노테이션 필수!
+	@Transactional
+	public void updateItem(Map<String, String> params) {
+		// Map 객체에 저장된 상품번호(id) 활용하여 DB 로부터 상품정보 조회
+		Long id = Long.parseLong(params.get("id"));
+		// ItemRepository - findById() 메서드 활용
+		Item item = itemRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("상품 정보 없음 - " + id));
+		
+		// Item 엔티티에 Map 객체에 저장되어있는 속성값 꺼내서 저장
+		// 단, 어떤 컬럼값을 변경할 지 알 수 없으므로 Map 객체의 name 속성값에 해당하는 필드에 value 속성값에 해당하는 값을 저장해야함
+		// Map -> Entity 로 변환할 때 name 속성명과 엔티티 필드명을 자동으로 대응하기 위해 별도의 메서드 정의하여 활용
+		// => 파라미터 : 엔티티 객체, 변경할 필드명, 변경할 데이터
+		// => 엔티티 객체를 전달하여 값을 직접 변경하므로 별도로 리턴받을 필요 없음
+		FieldUtils.convertFieldValue(item, params.get("name"), params.get("value"));
+		// => 엔티티의 값이 변경되면 즉시 해당 변경 사항이 DB 에 반영됨(더티체킹)
+	}
+	
+	
 
 }
 
