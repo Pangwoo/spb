@@ -13,7 +13,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -77,9 +76,7 @@ public class Item {
 	
 	// -----------------------------------------------------------------------------
 	// 상품(1) : 상품이미지(n)
-	// => @OneToMany(1:n) 관계를 표시할 경우 기본값으로 fetch = FetchType.LAZY 설정되어 있음(= 지연 로딩)
-	@OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
-//	@OneToMany(mappedBy = "item") // @OneToMany 사용 시 fetch = FetchType.LAZY 생략 가능
+	@OneToMany(mappedBy = "item")
 	private List<ItemImg> itemImgs = new ArrayList<>();
 	// -----------------------------------------------------------------------------
 	

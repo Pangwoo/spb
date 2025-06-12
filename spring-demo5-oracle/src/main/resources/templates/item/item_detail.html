@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/layout}">
+<head>
+	<title>Insert title here</title>
+	<!-- 개별페이지 전용 스타일시트 영역 -->
+	<th:block layout:fragment="style">
+		<link rel="stylesheet" th:href="@{/css/main.css}" />
+		<style>
+			.itemImg {
+				display: inline-block;
+			}		
+		
+			.itemImg img {
+				width: 100px;
+				height: 100px;
+			}
+		</style>
+	</th:block>
+</head>
+<body>
+	<th:block layout:fragment="content">
+		<h3>상품 상세정보</h3>
+		<div id="registForm">
+			<form th:action="@{/items}" th:object="${item}" method="post" enctype="multipart/form-data">
+				<table border="1">
+					<tr>
+						<th>상품명</th>
+						<td>
+							<input type="text" th:field="*{itemNm}"> <!-- name 속성값이 자동으로 itemNm 으로 설정됨 -->
+							<div th:if="${#fields.hasErrors('itemNm')}" th:errors="*{itemNm}"></div>
+						</td>
+					</tr>
+					<tr>
+						<th>가격</th>
+						<td>
+							<input type="number" th:field="*{price}"> <!-- name 속성값이 자동으로 price 로 설정됨 -->
+							<div th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+						</td> 
+					</tr>
+					<tr>
+						<th>재고수량</th>
+						<td>
+							<input type="number" th:field="*{stockQty}"> <!-- name 속성값이 자동으로 stockQty 로 설정됨 -->
+							<div th:if="${#fields.hasErrors('stockQty')}" th:errors="*{stockQty}"></div>
+						</td> 
+					</tr>
+					<tr>
+						<th>카테고리</th>
+						<td>
+							<select th:field="*{category}">
+								<option value="">카테고리 선택</option>
+								<option th:each="cat : ${T(kr.co.itwillbs.oracle.commons.constant.ItemCategory).values()}"
+										th:value="${cat}"
+										th:text="${cat.label}"></option>
+							</select>
+							<div th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
+						</td>
+					</tr>
+					<tr>
+						<th>판매상태</th>
+						<td>
+							<select th:field="*{sellStatus}">
+								<option value="">판매상태 선택</option>
+<!-- 								<option th:each="status : *{sellStatuses}" -->
+								<option th:each="status : ${T(kr.co.itwillbs.oracle.commons.constant.ItemSellStatus).values()}"
+										th:value="${status}"
+										th:text="${status.label}"></option>
+							</select>
+							<div th:if="${#fields.hasErrors('sellStatus')}" th:errors="*{sellStatus}"></div>
+						</td>
+					</tr>
+					<tr>
+						<th>상세설명</th>
+						<td>
+							<!-- 텍스트에어리어도 동일한 방식으로 th:field 속성 적용 가능 -->
+							<textarea th:field="*{itemDetail}" rows="4" cols="20"></textarea>
+							<div th:if="${#fields.hasErrors('itemDetail')}" th:errors="*{itemDetail}"></div>
+						</td>
+					</tr>
+					<tr>
+						<th>상품이미지</th>
+						<td>
+							<!-- 이미지 파일 정보(리스트) 반복 출력 -->
+							<div class="itemImg" th:each="itemImg : *{itemImgDTOList}">
+<!-- 								<div th:text="${itemImg}"></div> -->
+								<!-- GlobalModelAttribute 클래스를 통해 Model 에 저장한 프로퍼티값 출력해보기 -->
+<!-- 								<div th:text="${uploadBaseLocation}"></div> -->
+
+								<!-- 클라이언트 상에서 스프링 리소스 요청 시 접근 경로 상의 루트(/)는 프로젝트 상의 static 디렉토리가 된다! -->
+								<!-- 1) /images/item 경로상의 파일명을 사용하여 img 태그로 이미지 표시 -->
+								<!--    주의! 경로 표시를 위해 @{} 사용 시 내부에 타임리프에서 접근하는 객체 사용하려면 ${} 지정하면 안된다! -->
+								<!--    => @{.../{파라미터명}(파라미터명=${객체명 또는 속성명})} -->
+<!-- 								<img th:src="@{/images/item/{imgName}(imgName=${itemImg.imgName})}" /> -->
+								<img th:src="@{{imgLocation}/{imgName}(imgLocation=${itemImg.imgLocation}, imgName=${itemImg.imgName})}" />
+								
+								<!-- 2) 스토리지(디스크) 상의 실제 경로를 결합하여 경로 표시 -->
+								<!--    => 조회된 디렉토리인 imgLocation 속성값과 Model 에 저장되어 있는 실제 기본 경로 uploadBaseLocation 활용 -->
+<!-- 								<img th:src="@{{uploadBaseLocation}{imgLocation}/{imgName}(uploadBaseLocation=${uploadBaseLocation}, imgLocation=${itemImg.imgLocation}, imgName=${itemImg.imgName})}" /> -->
+								<br>
+								<!-- 첨부파일 다운로드 2가지 방법 -->
+								<!-- 1) HTML5 에서 제공하는 download 속성을 활용하여 클라이언트가 리소스를 직접 요청하는 방식(static 경로에 직접 접근) -->
+<!-- 								<a th:href="@{{imgLocation}/{imgName}(imgLocation=${itemImg.imgLocation}, imgName=${itemImg.imgName})}" download> -->
+<!-- 									<input type="button" value="다운로드(Direct)"> -->
+<!-- 								</a> -->
+								<!-- download 속성값 설정 시 다운로드되는 파일명 변경 가능 -->
+								<a th:href="@{{imgLocation}/{imgName}(imgLocation=${itemImg.imgLocation}, imgName=${itemImg.imgName})}" th:download="${itemImg.originalImgName}">
+									<input type="button" value="다운로드(Direct)">
+								</a>
+								<br>
+								<!-- 2) 서버로 이미지 다운로드 요청만 전송하고 서버측에서 이미지를 Resource 타입으로 전달하는 방법(다운로드 창 동일) -->
+								<!--    => 이미지의 URL 등이 노출되지 않고, 이미지에 대한 id 값만 요청정보로 전송하면 서버측에서 실제 이미지를 응답 -->
+								<a th:href="@{/items/download/{id}(id=${itemImg.id})}">
+									<input type="button" value="다운로드(Resource)">
+								</a>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2"><input type="submit" value="등록"></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+	</th:block>
+	
+	<!-- 레이아웃 내의 script 프래그먼트 영역에 추가될 스크립트 -->
+	<th:block layout:fragment="script">
+		<script th:src="@{/js/main.js}"></script>
+	</th:block>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

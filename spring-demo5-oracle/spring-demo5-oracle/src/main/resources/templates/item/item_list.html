@@ -7,11 +7,6 @@
 	<!-- 개별페이지 전용 스타일시트 영역 -->
 	<th:block layout:fragment="style">
 		<link rel="stylesheet" th:href="@{/css/main.css}" />
-		<style>
-			.itemTr:hover {
-				background-color: orange;
-			}
-		</style>
 	</th:block>
 </head>
 <body>
@@ -51,7 +46,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr th:each="item : ${itemList}" class="itemTr" th:data-id="${item.id}">
+				<tr th:each="item : ${itemList}">
 					<td th:text="${item.id}"></td>
 					<td th:text="${item.itemNm}"></td>
 					<td th:text="${item.itemDetail}"></td>
@@ -284,14 +279,6 @@
 				
 				// 페이지 로딩 완료 시 상품검색 셀렉트박스에 change 이벤트 강제로 발생시키기
 				$("#searchType").trigger("change");
-				
-				// ========================================================================================
-				// 상품 목록에서 상품 클릭 시 상세정보 조회 요청
-				$(".itemTr").click(function() {
-					// 클릭한 tr 태그의 th:data-id="${item.id}" 속성값 가져오기
-					const itemId = $(this).data("id");
-					location.href = `/items/${itemId}`; // id 값을 읽어와서 동적 URL 로 생성
-				});
 					
 			});
 		</script>

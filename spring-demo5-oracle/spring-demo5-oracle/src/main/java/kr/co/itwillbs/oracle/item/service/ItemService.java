@@ -9,14 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import kr.co.itwillbs.oracle.commons.util.FieldUtils;
 import kr.co.itwillbs.oracle.item.dto.ItemDTO;
-import kr.co.itwillbs.oracle.item.dto.ItemImgDTO;
 import kr.co.itwillbs.oracle.item.dto.ItemSearchDTO;
 import kr.co.itwillbs.oracle.item.entity.Item;
-import kr.co.itwillbs.oracle.item.entity.ItemImg;
 import kr.co.itwillbs.oracle.item.mapper.ItemMapper;
 import kr.co.itwillbs.oracle.item.repository.ItemRepository;
 import lombok.extern.log4j.Log4j2;
@@ -150,31 +147,6 @@ public class ItemService {
 //		List<Item> itemList = itemRepository.findBySearchParams(itemSearchDTO.getItemNm(), itemSearchDTO.getMinPrice(), itemSearchDTO.getMaxPrice());
 		
 		return toItemDTOList(itemList);
-	}
-	
-	// ===================================================================
-	// 상품 1개 상세정보 조회 요청
-	@Transactional(readOnly = true) // 단순 SELECT 일 경우 읽기전용 트랜잭션으로 설정하여 조회 성능 향상시킬 수 있다!
-	public ItemDTO getItem(Long itemId) {
-		// 상품 1개 정보(= 엔티티) 조회
-		Item item = itemRepository.findById(itemId)
-				.orElseThrow(() -> new EntityNotFoundException("해당 상품이 존재하지 않습니다!"));
-		
-		// Item -> ItemDTO 로 변환
-		ItemDTO itemDTO = ItemDTO.fromEntity(item);
-//		System.out.println("ItemDTO : " + itemDTO);
-		
-		// Item 엔티티 조회할 때 ItemImg 엔티티 관련 정보는 FetchType=LAZY 로 설정되어 있으므로(@OneToMany 관계 기본값)
-		// 해당 데이터가 실제로 사용되는 시점에 조회가 일어난다! 즉, Item 엔티티를 조회할 때 이미지 정보는 동시에 조회되지 않는다!
-		List<ItemImg> itemImgList = item.getItemImgs();
-//		System.out.println(itemImgList); // List<ItemImg> 객체에 실제로 접근하는 시점인 이 코드가 실행될 때 실제 조회가 일어남!
-//		System.out.println(itemImgList.get(0).getImgName());
-		// List<ItemImg> -> List<ItemImgDTO> 타입으로 변환(스트림 활용)
-		itemDTO.setItemImgDTOList(itemImgList.stream()
-				.map(ItemImgDTO::of) // ItemImgDTO - of() 메서드 활용하여 변환
-				.collect(Collectors.toList()));
-		
-		return itemDTO;
 	}
 	
 	

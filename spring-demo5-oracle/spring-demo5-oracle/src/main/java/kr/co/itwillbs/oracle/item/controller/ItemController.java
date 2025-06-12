@@ -1,35 +1,24 @@
 package kr.co.itwillbs.oracle.item.controller;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.HashMap;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.validation.Valid;
 import kr.co.itwillbs.oracle.commons.constant.ItemCategory;
@@ -37,10 +26,8 @@ import kr.co.itwillbs.oracle.commons.constant.ItemSellStatus;
 import kr.co.itwillbs.oracle.commons.util.EnumUtils;
 import kr.co.itwillbs.oracle.commons.util.FieldUtils;
 import kr.co.itwillbs.oracle.item.dto.ItemDTO;
-import kr.co.itwillbs.oracle.item.dto.ItemImgDTO;
 import kr.co.itwillbs.oracle.item.dto.ItemSearchDTO;
 import kr.co.itwillbs.oracle.item.entity.Item;
-import kr.co.itwillbs.oracle.item.service.ItemImgService;
 import kr.co.itwillbs.oracle.item.service.ItemService;
 import lombok.extern.log4j.Log4j2;
 
@@ -49,19 +36,9 @@ import lombok.extern.log4j.Log4j2;
 @Controller
 @RequestMapping("/items")
 public class ItemController {
-	private final ItemService itemService;
-	private final ItemImgService itemImgService;
-	
-	public ItemController(ItemService itemService, ItemImgService itemImgService) {
-		this.itemService = itemService;
-		this.itemImgService = itemImgService;
-	}
+	@Autowired
+	private ItemService itemService;
 
-	// 파일 업로드 처리에 사용할 경로를 properties 파일에서 가져오기
-	// => 변수 선언부 앞(위)에 @Value("${프로퍼티 속성명}") 형태로 선언
-	@Value("${uploadBaseLocation}")
-	private String uploadBaseLocation;
-	// =========================================================
 	@GetMapping("/new")
 	public String showRegistForm(Model model) {
 		// ItemDTO 객체를 Model 객체에 추가(item)
@@ -274,74 +251,6 @@ public class ItemController {
 		
 		return "item/item_list";
 	}
-	
-	// =========================================================================
-	// 상품 상세정보 조회 요청
-	// http://localhost:8085/items/21 형태로 경로 뒤에 상품 아이디가 경로 형태로 함께 전달됨
-	@GetMapping("/{itemId}") // 매핑 메서드 파라미터 선언 시 @PathVariable("경로명") 을 지정하여 /{경로명} 바인딩
-	public String itemDetail(@PathVariable("itemId") Long itemId, Model model) {
-		System.out.println("itemId : " + itemId);
-		
-		// ItemService - getItem() 메서드 호출하여 상품 1개 상세정보 조회 요청
-		// => 파라미터 : 상품번호(id)   리턴타입 : ItemDTO
-		ItemDTO itemDTO = itemService.getItem(itemId);
-		model.addAttribute("item", itemDTO);
-		
-		return "item/item_detail";
-	}
-	// -------------------------------------
-	// 첨부파일 다운로드 요청
-	// => 첨부파일을 직접 응답데이터로 전송하기 위해 ResponseEntity<Resource> 타입을 리턴타입으로 선언
-	@GetMapping("/download/{itemImgId}") // 매핑 메서드 파라미터 선언 시 @PathVariable("경로명") 을 지정하여 /{경로명} 바인딩
-	public ResponseEntity<Resource> getFile(@PathVariable("itemImgId") Long itemImgId) {
-		System.out.println("itemImgId : " + itemImgId);
-		
-		// ItemImgService - getItemImg() 메서드 호출하여 상품이미지 1개 정보 조회 요청
-		// => 파라미터 : 상품이미지번호(itemImgId)   리턴타입 : ItemImgDTO
-		ItemImgDTO itemImgDTO = itemImgService.getItemImg(itemImgId);
-		
-		// 다운로드 할 파일 정보를 서버 상의 업로드 디렉토리 활용하여 가져오기
-		Path path = Paths.get(uploadBaseLocation, itemImgDTO.getImgLocation())
-					.resolve(itemImgDTO.getImgName()).normalize();
-		System.out.println(path);
-		// ------------------------------------------------
-		try {
-			// 이미지 파일에 대한 Resource 객체 생성
-			Resource resource = new UrlResource(path.toUri());
-			
-			// 경로 및 파일 존재 여부 판별하고 실제 파일 접근 가능 여부도 확인
-			if(!resource.exists() || !resource.isReadable()) {
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다!");
-			}
-			
-			// 파일의 MIME 타입(= 컨텐츠 타입) 설정
-			String contentType = Files.probeContentType(path); // 실제 파일로부터 타입 알아내기
-			System.out.println("contentType : " + contentType);
-			
-			if(contentType == null) { // 컨텐츠 타입 조회 실패 시
-				contentType = "application/octet-stream"; // 일반적인 바이너리 파일로 컨텐츠 타입 강제 고정
-			}
-			
-			// -------------------------------------------
-			// 한글, 공백 등이 포함된 파일은 별도의 처리 필요
-			// -------------------------------------------
-			
-			// 응답데이터 리턴
-			return ResponseEntity.ok() // 정상적인 응답(HTTP 200) 설정
-					.contentType(MediaType.APPLICATION_OCTET_STREAM) // 기본 바이너리 파일 설정
-					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + itemImgDTO.getOriginalImgName() + "\"")
-					.body(resource);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-	
 	
 	
 	

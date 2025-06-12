@@ -1,7 +1,6 @@
 package kr.co.itwillbs.oracle.item.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.modelmapper.ModelMapper;
 
@@ -73,10 +72,6 @@ public class ItemDTO {
 //	private ItemSellStatus[] sellStatuses = ItemSellStatus.values();
 	// => 타임리프 템플릿 페이지에서 ${T(패키지명.enum타입명).values()} 형태로 직접 호출 가능
 	
-	// 상품 이미지 목록 정보를 저장할 리스트 타입 선언
-	private List<ItemImgDTO> itemImgDTOList;
-	
-	// ==========================================================================================
 	// 파라미터 생성자 정의
 	@Builder
 	public ItemDTO(Long id, String itemNm, String itemDetail, Integer price,	Integer stockQty, ItemCategory category, ItemSellStatus sellStatus, 
